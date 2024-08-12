@@ -1,3 +1,4 @@
-# NBA API
+# Movie Director API
 
-Dataset: https://www.kaggle.com/datasets/wyattowalsh/basketball
+Dataset: https://www.kaggle.com/datasets/luizpaulodeoliveira/imdb-project-sql
+
