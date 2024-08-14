@@ -3,8 +3,9 @@ package domain
 import (
 	"context"
 	"database/sql"
+	"errors"
+	"github.com/gazmanzara/movdir/app/errs"
 	_ "github.com/go-sql-driver/mysql"
-	"log"
 	"time"
 )
 
@@ -13,17 +14,19 @@ type DirectorRepositoryDB struct {
 	ctx context.Context
 }
 
-func (d DirectorRepositoryDB) FindAll() ([]Director, error) {
-	defer d.db.Close()
+func (d DirectorRepositoryDB) FindAll() ([]Director, *errs.AppError) {
 	query := `SELECT * FROM directors;`
 
-	rows, err := d.db.QueryContext(d.ctx, query)
-	defer rows.Close()
-
+	rows, err := d.db.Query(query)
 	if err != nil {
-		log.Println(err.Error())
-		return nil, err
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errs.NewNotFoundError("No directors found")
+		} else {
+			println(err.Error())
+			return nil, errs.NewInternalServerError("Unexpected error while querying the database")
+		}
 	}
+	defer rows.Close()
 
 	var directors []Director
 
@@ -37,7 +40,7 @@ func (d DirectorRepositoryDB) FindAll() ([]Director, error) {
 		)
 
 		if err != nil {
-			return nil, err
+			return nil, errs.NewInternalServerError("Error while scanning directors")
 		}
 
 		directors = append(directors, director)
@@ -46,9 +49,32 @@ func (d DirectorRepositoryDB) FindAll() ([]Director, error) {
 	return directors, nil
 }
 
+func (d DirectorRepositoryDB) FindById(id string) (*Director, *errs.AppError) {
+	query := `SELECT * FROM directors WHERE id = ?;`
+
+	row := d.db.QueryRow(query, id)
+
+	var director Director
+
+	err := row.Scan(
+		&director.Id,
+		&director.Name,
+		&director.Gender,
+	)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, errs.NewNotFoundError("Director not found")
+		} else {
+			return nil, errs.NewInternalServerError("Unexpected error while querying the database")
+		}
+	}
+
+	return &director, nil
+}
+
 func NewDirectorRepositoryDB() DirectorRepositoryDB {
 	db, err := sql.Open("mysql", "root:@tcp(localhost:3306)/movdir")
-
 	if err != nil {
 		panic(err.Error())
 	}

@@ -14,6 +14,7 @@ func Start() {
 	ch := DirectorHandlers{service: service.NewDirectorService(domain.NewDirectorRepositoryDB())}
 
 	router.HandleFunc("/directors", ch.getAllDirectors).Methods(http.MethodGet)
+	router.HandleFunc("/directors/{id}", ch.getDirectorById).Methods(http.MethodGet)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
