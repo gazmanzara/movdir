@@ -1,0 +1,28 @@
+--------------------------------
+            MySQL Query
+--------------------------------
+- Create Directors Table
+    CREATE TABLE directors (
+        id INT NOT NULL UNIQUE,
+        name VARCHAR(50) NOT NULL,
+        mpg INT NOT NULL,
+        PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+
+- Create Users Table
+    CREATE TABLE users (
+        id INT NOT NULL AUTO_INCREMENT,
+        username VARCHAR(50) NOT NULL UNIQUE,
+        password VARCHAR(50) NOT NULL,
+        PRIMARY KEY (id)
+    ) ENGINE=InnoDB;
+
+- Show Tables Field
+    SHOW TABLES;
+    DESC directors;
+    DESC users;
+
+--------------------------------
+         Start Command
+--------------------------------
+DB_USERNAME=root DB_PASSWORD= DB_NAME=movdir DB_HOST=localhost DB_PORT=3306 go run main.go

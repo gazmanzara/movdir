@@ -13,10 +13,24 @@ func (e *AppError) AsMessage() *AppError {
 	}
 }
 
+func NewBadRequestError(message string) *AppError {
+	return &AppError{
+		Message: message,
+		Code:    http.StatusBadRequest,
+	}
+}
+
 func NewNotFoundError(message string) *AppError {
 	return &AppError{
 		Message: message,
 		Code:    http.StatusNotFound,
+	}
+}
+
+func NewUnprocessableEntityError(message string) *AppError {
+	return &AppError{
+		Message: message,
+		Code:    http.StatusUnprocessableEntity,
 	}
 }
 

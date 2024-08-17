@@ -4,9 +4,11 @@ import (
 	"context"
 	"database/sql"
 	"errors"
-	"github.com/gazmanzara/movdir/app/errs"
+	"fmt"
+	"github.com/gazmanzara/movdir/errs"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jmoiron/sqlx"
+	"os"
 	"time"
 )
 
@@ -21,6 +23,7 @@ func (d DirectorRepositoryDB) FindAll() ([]Director, *errs.AppError) {
 	query := `SELECT * FROM directors;`
 	err := d.db.Select(&directors, query)
 	if err != nil {
+		println(err.Error())
 		return nil, errs.NewInternalServerError("Unexpected database error!")
 	}
 
@@ -44,8 +47,30 @@ func (d DirectorRepositoryDB) FindById(id string) (*Director, *errs.AppError) {
 	return &director, nil
 }
 
+func (d DirectorRepositoryDB) Save(director Director) (*Director, *errs.AppError) {
+	query := `INSERT INTO directors (id, name, gender) VALUES (?, ?, ?);`
+	exec, err := d.db.Exec(query, director.Id, director.Name, director.Gender)
+	if err != nil {
+		return nil, errs.NewInternalServerError("Unexpected error while saving the director")
+	}
+
+	_, err = exec.LastInsertId()
+	if err != nil {
+		return nil, errs.NewInternalServerError("Unexpected error while getting the director id")
+	}
+
+	return &director, nil
+}
+
 func NewDirectorRepositoryDB() DirectorRepositoryDB {
-	db, err := sqlx.Open("mysql", "root:@tcp(localhost:3306)/movdir")
+	dbUsername := os.Getenv("DB_USERNAME")
+	dbPassword := os.Getenv("DB_PASSWORD")
+	dbHost := os.Getenv("DB_HOST")
+	dbPort := os.Getenv("DB_PORT")
+	dbName := os.Getenv("DB_NAME")
+
+	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", dbUsername, dbPassword, dbHost, dbPort, dbName)
+	db, err := sqlx.Open("mysql", dataSource)
 	if err != nil {
 		panic(err.Error())
 	}

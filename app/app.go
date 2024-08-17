@@ -15,6 +15,7 @@ func Start() {
 
 	router.HandleFunc("/directors", ch.getAllDirectors).Methods(http.MethodGet)
 	router.HandleFunc("/directors/{id}", ch.getDirectorById).Methods(http.MethodGet)
+	router.HandleFunc("/directors", ch.createDirector).Methods(http.MethodPost)
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

@@ -1,8 +1,8 @@
 package domain
 
 import (
-	"github.com/gazmanzara/movdir/app/errs"
-	"github.com/gazmanzara/movdir/domain/dto"
+	"github.com/gazmanzara/movdir/dto"
+	"github.com/gazmanzara/movdir/errs"
 )
 
 type Director struct {
@@ -22,4 +22,5 @@ func (d *Director) ToDTO() *dto.Director {
 type DirectorRepository interface {
 	FindAll() ([]Director, *errs.AppError)
 	FindById(id string) (*Director, *errs.AppError)
+	Save(director Director) (*Director, *errs.AppError)
 }
