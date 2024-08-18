@@ -3,12 +3,13 @@ package domain
 import "github.com/gazmanzara/movdir/auth/errs"
 
 type User struct {
-	Id       string `json:"id"`
+	Id       int    `json:"id"`
 	Username string `json:"username"`
 	Password string `json:"password"`
-	Role     string `json:"role"`
+	Role     int    `json:"role"`
 }
 
 type AuthRepository interface {
-	Login(username string, password string) (string, *errs.AppError)
+	FindOne(username string, password string) (*User, *errs.AppError)
+	Save(user User) (*User, *errs.AppError)
 }

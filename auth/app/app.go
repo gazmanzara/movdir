@@ -16,6 +16,7 @@ func Start() {
 	}
 
 	router.HandleFunc("/login", h.login).Methods("POST")
+	router.HandleFunc("/register", h.register).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", router))
 }

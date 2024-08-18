@@ -31,6 +31,25 @@ func (h *Handlers) login(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
+func (h *Handlers) register(w http.ResponseWriter, r *http.Request) {
+	var payload dto.RegisterRequest
+
+	err := json.NewDecoder(r.Body).Decode(&payload)
+	if err != nil {
+		newErr := errs.NewBadRequestError("invalid request payload")
+		writeJsonResponse(newErr.Code, w, newErr.AsMessage())
+		return
+	}
+
+	res, appErr := h.service.Register(payload)
+	if appErr != nil {
+		writeJsonResponse(appErr.Code, w, appErr.AsMessage())
+		return
+	}
+	writeJsonResponse(http.StatusOK, w, res)
+	return
+}
+
 func writeJsonResponse(code int, w http.ResponseWriter, data interface{}) {
 	w.WriteHeader(code)
 	err := json.NewEncoder(w).Encode(data)
